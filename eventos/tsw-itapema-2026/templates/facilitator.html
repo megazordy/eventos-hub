@@ -45,6 +45,7 @@ body { margin: 0; }
     {{#person.cpf}}<div style="font-size: 16px; font-weight: 700; color: var(--tealDark); margin-top: 8px">CPF {{person.cpf}}</div>{{/person.cpf}}
     <div style="width: 96px; height: 4px; border-radius: 4px; background: var(--teal); margin-top: 18px"></div>
     <p style="margin: 18px 0 0; font-size: 17px; line-height: 1.6; text-wrap: pretty">atuou como <b>facilitador(a)</b> na {{event.edition}} do <b>{{event.name}}</b>, realizada de {{event.dates.label}}, em {{event.city}}, conduzindo a programação e as equipes ao longo das {{event.hours}} horas.</p>
+    {{#person.note}}<p style="margin: 12px 0 0; font-size: 15px; line-height: 1.55; color: var(--navy); text-wrap: pretty">{{person.note}}</p>{{/person.note}}
     <div style="margin-top: auto; display: flex; flex-direction: column; gap: 22px">
       <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 32px">
         <div style="display: flex; gap: 40px">
