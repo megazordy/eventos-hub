@@ -6,7 +6,8 @@ const { subtle } = globalThis.crypto;
 const getRandomValues = (arr) => globalThis.crypto.getRandomValues(arr);
 const enc = new TextEncoder();
 
-// Sem caracteres ambíguos (0/O, 1/I/L). 31 símbolos ^ 8 ≈ 40 bits por código.
+// Sem caracteres ambíguos (0/O, 1/I/L). 31 símbolos ^ 12 ≈ 59 bits por código: com PBKDF2 lento,
+// adivinhar um código por força bruta fica inviável (o índice público é cifrado com esse código).
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 function randomChars(n) {
@@ -18,7 +19,7 @@ function randomChars(n) {
   return out;
 }
 
-export const newCode = (prefix) => `${prefix}-${randomChars(4)}-${randomChars(4)}`;
+export const newCode = (prefix) => `${prefix}-${randomChars(4)}-${randomChars(4)}-${randomChars(4)}`;
 
 export const normalizeCode = (c) => String(c || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
 

@@ -34,7 +34,7 @@
     "url": "https://megazordy.github.io/eventos-hub/",
     "codePrefix": "TSWI26",
     "salt": "tswi26-itapema-turistech",
-    "iterations": 150000
+    "iterations": 600000
   },
 
   "drive": {

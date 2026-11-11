@@ -4,6 +4,7 @@
 //   node certificados/generate.js --event tsw-itapema-2026 --type participante --list input/participantes.csv
 //   opções: --no-upload (só gera os PDFs locais) · --draft (prévia, aceita assinaturas pendentes, não publica)
 //           --only-index (só reconstrói docs/data a partir do controle local)
+//           --new-codes (troca o código de todos da lista; use só antes de distribuir os certificados)
 //
 // IO / estado:
 // - lê eventos/<evento>/event.json, modelos e a lista CSV;
@@ -65,7 +66,8 @@ async function publishIndex(event, ledger) {
       role: entry.role || '',
       pdfUrl: entry.url || '',
     };
-    const hash = sha(payload);
+    // Refaz o registro se mudar o dado, o código ou os parâmetros de derivação.
+    const hash = sha({ payload, code: entry.code, salt: event.verification.salt, iterations: event.verification.iterations });
     if (!entry.record || entry.recordHash !== hash) {
       entry.record = await encryptRecord(entry.code, payload, event.verification);
       entry.recordHash = hash;
@@ -139,7 +141,9 @@ async function main() {
     for (const person of people) {
       const key = personKey(args.type, person);
       const existing = ledger.entries[key];
-      const code = draft ? `${event.verification.codePrefix}-PREV-IA00` : existing?.code || newCode(event.verification.codePrefix);
+      const code = draft
+        ? `${event.verification.codePrefix}-PREV-IA00-0000`
+        : (!args['new-codes'] && existing?.code) || newCode(event.verification.codePrefix);
       const verifyUrl = `${event.verification.url}#${code}`;
       const fileName = `${safeFileName(person.name)} - ${code}.pdf`;
       try {

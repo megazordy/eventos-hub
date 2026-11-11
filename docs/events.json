@@ -9,7 +9,7 @@
     "city": "Itapema/SC",
     "contact": "switapema@gmail.com · Instagram @switapema",
     "salt": "tswi26-itapema-turistech",
-    "iterations": 150000,
+    "iterations": 600000,
     "data": "data/tsw-itapema-2026.json"
   }
 ]
