@@ -59,6 +59,11 @@
       "driveFolder": "Organizadores",
       "templates": ["organizer.html", "organizer-back.html"]
     },
+    "staff": {
+      "label": "Staff",
+      "driveFolder": "Staff",
+      "templates": ["staff.html", "staff-back.html"]
+    },
     "facilitador": {
       "label": "Facilitador(a)",
       "driveFolder": "Facilitadores",
