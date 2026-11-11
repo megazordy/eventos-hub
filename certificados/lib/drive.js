@@ -12,6 +12,21 @@ export function loadDriveConfig(rootDir) {
   return url && token ? { url, token } : null;
 }
 
+// Envia um e-mail individual pela conta da organização com o PDF do Drive em anexo.
+export async function sendCertificateEmail(config, message) {
+  const res = await fetch(config.url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ token: config.token, action: 'send', ...message }),
+    redirect: 'follow',
+  });
+  const text = await res.text();
+  let json;
+  try { json = JSON.parse(text); } catch { throw new Error(`Resposta inesperada do Apps Script (HTTP ${res.status}). Publicou a nova versão?`); }
+  if (!json.ok) throw new Error(`Apps Script: ${json.error}`);
+  return json; // { ok, remaining }
+}
+
 export async function uploadCertificate(config, { folderPath, fileName, pdf, control, row }) {
   const res = await fetch(config.url, {
     method: 'POST',
