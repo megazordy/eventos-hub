@@ -12,13 +12,33 @@
  * - cria (se faltar) a pasta folderPath a partir de "Meu Drive";
  * - salva o PDF (substitui um de mesmo nome), compartilha "qualquer pessoa com o link: leitor";
  * - grava/atualiza a linha do código na planilha de controle (privada, só a organização).
+ * Com action = "send": envia um e-mail individual, a partir da conta da organização,
+ * com o PDF do Drive (fileId) em anexo. Cota do Gmail pessoal: ~100 destinatários/dia.
+ *
+ * Ao atualizar este arquivo: Implantar → Gerenciar implantações → lápis → Versão: "Nova versão" → Implantar
+ * (mantém a mesma URL). Na primeira vez com envio de e-mail o Google pede uma nova autorização.
  */
+
+function sendCertificate_(body) {
+  var file = DriveApp.getFileById(body.fileId);
+  MailApp.sendEmail({
+    to: body.to,
+    subject: body.subject,
+    body: body.text,
+    htmlBody: body.html,
+    name: body.senderName,
+    replyTo: body.replyTo,
+    attachments: [file.getBlob().setName(file.getName())]
+  });
+  return { ok: true, remaining: MailApp.getRemainingDailyQuota() };
+}
 
 function doPost(e) {
   try {
     var body = JSON.parse(e.postData.contents);
     var expected = PropertiesService.getScriptProperties().getProperty('TOKEN');
     if (!expected || body.token !== expected) return reply_({ ok: false, error: 'token inválido' });
+    if (body.action === 'send') return reply_(sendCertificate_(body));
 
     var lock = LockService.getScriptLock();
     lock.waitLock(30000);

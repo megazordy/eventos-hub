@@ -20,6 +20,7 @@ const HEADER_MAP = {
   'cnpj/cpf': 'document', 'cpf/cnpj': 'document', documento: 'document',
   cota: 'tier', 'tipo de patrocinio': 'tier', 'tipo de patrocinador': 'tier',
   observacao: 'note', observacoes: 'note', detalhes: 'note',
+  apelido: 'nickname', 'como chamar': 'nickname',
 };
 const mapHeader = (h) => HEADER_MAP[normalizeHeader(h)] || null;
 
@@ -62,7 +63,7 @@ export function readPeopleCsv(path) {
   if (!keys.includes('name')) throw new Error('A lista precisa de uma coluna "nome".');
   return lines.slice(1).map((line) => {
     const cells = splitLine(line, sep);
-    const person = { name: '', team: '', role: '', email: '', cpf: '', cnpj: '', tier: '', note: '', document: '' };
+    const person = { name: '', team: '', role: '', email: '', cpf: '', cnpj: '', tier: '', note: '', nickname: '', document: '' };
     keys.forEach((k, i) => { if (k && !person[k]) person[k] = cells[i] || ''; });
     // Coluna única "CNPJ/CPF": 11 dígitos = CPF, senão CNPJ.
     const doc = person.document.replace(/\D/g, '');
