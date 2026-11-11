@@ -107,7 +107,7 @@ async function verify(raw) {
     const d = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(rec.iv) }, key, unb64(rec.ct))));
     let rows = `<dt>Certificado</dt><dd>${esc(d.type)}</dd>`;
     if (d.team) rows += `<dt>Startup</dt><dd>${esc(d.team)}</dd>`;
-    rows += `<dt>Evento</dt><dd>${esc(ev.name)} (${esc(ev.edition)})</dd><dt>Data</dt><dd>${esc(ev.dates)}</dd><dt>Local</dt><dd>${esc(ev.city)}</dd><dt>Carga horária</dt><dd>${esc(ev.hours)} horas</dd><dt>Código</dt><dd>${esc(code.toUpperCase())}</dd>`;
+    rows += `<dt>Evento</dt><dd>${esc(ev.name)} (${esc(ev.edition)})</dd><dt>Data</dt><dd>${esc(d.dates || ev.dates)}</dd><dt>Local</dt><dd>${esc(ev.city)}</dd><dt>Carga horária</dt><dd>${esc(d.hours || ev.hours)} horas</dd><dt>Código</dt><dd>${esc(code.toUpperCase())}</dd>`;
     const pdf = /^https:\/\/drive\.google\.com\//.test(d.pdfUrl || "")
       ? `<a class="btn" href="${esc(d.pdfUrl)}" target="_blank" rel="noopener noreferrer">Abrir certificado (PDF)</a>`
       : '<p class="hint">O PDF deste certificado ainda está sendo publicado. Tente novamente mais tarde.</p>';

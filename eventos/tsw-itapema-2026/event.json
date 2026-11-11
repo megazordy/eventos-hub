@@ -69,6 +69,13 @@
       "driveFolder": "Facilitadores",
       "templates": ["facilitator.html", "facilitator-back.html"]
     },
+    "jurado": {
+      "label": "Jurado(a)",
+      "driveFolder": "Jurados",
+      "hours": 6,
+      "dates": "8 de novembro de 2026 (domingo), das 16h às 22h",
+      "templates": ["jury.html"]
+    },
     "patrocinador": {
       "label": "Patrocinador",
       "driveFolder": "Patrocinadores",

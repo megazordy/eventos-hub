@@ -67,6 +67,9 @@ async function publishIndex(event, ledger) {
       team: entry.team || '',
       role: entry.role || '',
       pdfUrl: entry.url || '',
+      // Carga horária e data próprias do tipo (ex.: jurado só no domingo); omitidas quando iguais às do evento.
+      ...(event.types[entry.type]?.hours ? { hours: event.types[entry.type].hours } : {}),
+      ...(event.types[entry.type]?.dates ? { dates: event.types[entry.type].dates } : {}),
     };
     // Refaz o registro se mudar o dado, o código ou os parâmetros de derivação.
     const hash = sha({ payload, code: entry.code, salt: event.verification.salt, iterations: event.verification.iterations });
