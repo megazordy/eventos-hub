@@ -228,3 +228,4 @@ output/
 *.xlsx
 
 *.local.json
+!certificados/lib/
