@@ -218,3 +218,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# eventos-hub: dados pessoais e artefatos gerados NUNCA vão para o Git
+node_modules/
+input/
+output/
+*.pdf
+*.csv
+*.xlsx
+
+*.local.json
+!certificados/lib/
+
+# assinaturas e outros arquivos sensíveis de cada evento
+eventos/*/assets/private/

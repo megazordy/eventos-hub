@@ -1,0 +1,15 @@
+[
+  {
+    "id": "tsw-itapema-2026",
+    "prefix": "TSWI26",
+    "name": "techstars_ Startup Weekend Itapema - Turistech",
+    "edition": "4ª edição",
+    "dates": "6 a 8 de novembro de 2026",
+    "hours": 54,
+    "city": "Itapema/SC",
+    "contact": "switapema@gmail.com · Instagram @switapema",
+    "salt": "tswi26-itapema-turistech",
+    "iterations": 600000,
+    "data": "data/tsw-itapema-2026.json"
+  }
+]

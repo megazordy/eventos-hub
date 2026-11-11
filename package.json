@@ -1,0 +1,16 @@
+{
+  "name": "eventos-hub",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "certificates": "node certificados/generate.js",
+    "publish-index": "node certificados/generate.js --only-index"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "puppeteer-core": "^23.11.1",
+    "qrcode": "^1.5.4"
+  }
+}
