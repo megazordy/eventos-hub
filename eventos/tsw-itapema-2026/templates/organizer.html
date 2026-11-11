@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<!-- Modelo: Organizador(a). Campos: veja certificados/README.md -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap">
+<style>
+:root { {{{cssVars}}} }
+@page { size: 1123px 794px; margin: 0; }
+body { margin: 0; }
+.page { width: 1123px; height: 794px; box-sizing: border-box; display: flex; overflow: hidden; background: #FFFFFF; font-family: Inter, sans-serif; color: var(--text); }
+.panel { width: 360px; height: 794px; box-sizing: border-box; padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between; background-color: var(--panel); background-image: radial-gradient(circle at 18% 88%, rgba(251,196,121,0.55), rgba(251,196,121,0) 42%), radial-gradient(circle at 92% 30%, rgba(90,199,179,0.45), rgba(90,199,179,0) 45%), radial-gradient(circle at 40% 10%, rgba(42,79,125,0.9), rgba(42,79,125,0) 55%); }
+.brand { font-weight: 800; font-size: 22px; line-height: 1.08; letter-spacing: -0.01em; color: #FFFFFF; }
+.brand .t { color: var(--teal); }
+.main { flex: 1; height: 794px; box-sizing: border-box; padding: 64px 72px 56px; display: flex; flex-direction: column; position: relative; }
+.sig { width: 250px; display: flex; flex-direction: column; gap: 4px; }
+.sig .line { height: 1px; background: var(--text); margin-bottom: 8px; }
+.sig .n { font-weight: 700; font-size: 15px; }
+.sig .r { font-size: 13px; }
+.qr svg { width: 84px; height: 84px; display: block; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <div class="brand"><div>techstars_</div><div>Startup Weekend</div><div class="t">Itapema</div><div class="t">Turistech</div></div>
+    <img src="assets/seagull-white.png" alt="" style="width: 220px; align-self: center">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 14px; font-weight: 700; color: var(--peach)">{{event.dates.short}} · {{event.city}}</div>
+      <div style="font-size: 34px; font-weight: 900; color: #FFFFFF; letter-spacing: -0.02em; line-height: 1">Organizador</div>
+    </div>
+  </div>
+  <div class="main">
+    <div style="position: absolute; top: 52px; right: 60px"><svg width="52" height="52" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 C53 40 60 47 94 50 C60 53 53 60 50 94 C47 60 40 53 6 50 C40 47 47 40 50 6Z" fill="#1F3862"></path><g stroke="#FBC479" stroke-width="5" stroke-linecap="round"><line x1="20" y1="20" x2="28" y2="28"></line><line x1="80" y1="20" x2="72" y2="28"></line><line x1="20" y1="80" x2="28" y2="72"></line><line x1="80" y1="80" x2="72" y2="72"></line></g></svg></div>
+    <h1 style="margin: 0; font-size: 64px; font-weight: 900; line-height: 1; letter-spacing: -0.03em; color: var(--navy)">Certificado</h1>
+    <div style="margin-top: 14px"><span style="display: inline-flex; align-items: center; padding: 8px 20px; border-radius: 999px; background: var(--navy); color: #FFFFFF; font-weight: 800; font-size: 17px; line-height: 1">de organização</span></div>
+    <div style="font-size: 17px; font-weight: 500; margin-top: 44px">certificamos que</div>
+    <div style="font-size: 38px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; line-height: 1.1; margin-top: 10px">{{person.name}}</div>
+    <div style="width: 96px; height: 4px; border-radius: 4px; background: var(--teal); margin-top: 18px"></div>
+    <p style="margin: 18px 0 0; font-size: 17px; line-height: 1.6; text-wrap: pretty">integrou a <b>equipe de organização</b> na {{event.edition}} do <b>{{event.name}}</b>, realizada de {{event.dates.label}}, em {{event.city}}, tornando possíveis {{event.hours}} horas de empreendedorismo na prática.</p>
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end">
+        <div style="display: flex; gap: 48px">
+          <div class="sig"><div class="line"></div><div class="n">{{sig1.name}}</div><div class="r">{{sig1.role}}</div></div>
+          <div class="sig"><div class="line"></div><div class="n">{{sig2.name}}</div><div class="r">{{sig2.role}}</div></div>
+        </div>
+        <div class="qr">{{{qrSvg}}}</div>
+      </div>
+      <div style="font-size: 13px">{{event.city}}, {{event.dates.issuedAt}} · código de validação: <b>{{code}}</b> · {{verifyHost}}</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

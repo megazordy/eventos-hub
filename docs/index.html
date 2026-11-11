@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Verificação de certificados</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap">
+<style>
+  :root { --navy:#1F3862; --turq:#5AC7B3; --turq-dark:#2A8F7F; --peach:#FBC479; --graf:#323232; --line:#D5DCE6; --bg:#F4F6F9; --card:#fff; --muted:#5B6573; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Inter, system-ui, sans-serif; color: var(--graf); background: var(--bg); min-height:100vh; }
+  header { padding: 40px 16px 96px; color:#fff; background-color:#2B2A63;
+    background-image: radial-gradient(circle at 12% 90%, rgba(251,196,121,.5), rgba(251,196,121,0) 40%),
+      radial-gradient(circle at 88% 20%, rgba(90,199,179,.45), rgba(90,199,179,0) 45%),
+      radial-gradient(circle at 45% 0%, rgba(42,79,125,.9), rgba(42,79,125,0) 60%); }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  .brand { font-weight:800; font-size:15px; letter-spacing:.02em; color: var(--turq); }
+  h1 { margin: 16px 0 6px; font-size: clamp(28px, 6vw, 40px); font-weight:900; letter-spacing:-.02em; line-height:1.05; }
+  header p { margin:0; font-size:15px; opacity:.9; }
+  main { margin-top: -64px; padding: 0 16px 48px; }
+  .card { background: var(--card); border-radius:20px; padding: 28px 24px; box-shadow: 0 8px 30px rgba(31,56,98,.12); }
+  label { display:block; font-weight:800; color:var(--navy); font-size:15px; margin-bottom:10px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; }
+  input { flex:1 1 220px; min-width:0; min-height:48px; padding: 0 16px; border:1.5px solid var(--line); border-radius:999px;
+    font: 600 16px Inter, sans-serif; color:var(--navy); text-transform:uppercase; letter-spacing:.04em; }
+  input:focus { outline: 3px solid rgba(90,199,179,.45); border-color: var(--turq); }
+  button, .btn { min-height:48px; padding: 0 24px; border:0; border-radius:999px; background:var(--navy); color:#fff;
+    font: 800 15px Inter, sans-serif; cursor:pointer; display:inline-flex; align-items:center; gap:8px; text-decoration:none; }
+  button:hover, .btn:hover { background:#16294a; }
+  button[disabled] { opacity:.6; cursor:wait; }
+  .hint { font-size:13px; color:var(--muted); margin: 10px 0 0; }
+  .result { margin-top: 22px; border-radius:16px; padding: 22px; display:none; }
+  .result.ok { display:block; background: #EAF8F5; border: 1.5px solid var(--turq); }
+  .result.bad { display:block; background: #FFF6EA; border: 1.5px solid var(--peach); }
+  .status { display:flex; align-items:center; gap:10px; font-weight:900; font-size:18px; color:var(--navy); }
+  .name { font-size: 26px; font-weight:900; color:var(--navy); margin: 14px 0 4px; letter-spacing:-.01em; overflow-wrap:anywhere; }
+  dl { display:grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 14px 0 18px; font-size:15px; }
+  dt { font-weight:800; color:var(--turq-dark); }
+  dd { margin:0; color:var(--navy); font-weight:600; overflow-wrap:anywhere; }
+  footer { text-align:center; font-size:13px; color:var(--muted); padding: 0 16px 32px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">eventos-hub</div>
+    <h1>Verificação de certificado</h1>
+    <p>Digite o código impresso no certificado ou leia o QR code.</p>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div class="card">
+      <form id="f">
+        <label for="code">Código de validação</label>
+        <div class="row">
+          <input id="code" name="code" autocomplete="off" spellcheck="false" placeholder="TSWI26-XXXX-XXXX" aria-describedby="hint">
+          <button type="submit" id="go">Verificar</button>
+        </div>
+        <p class="hint" id="hint">O código está no rodapé do certificado. Ao ler o QR code, a verificação é feita automaticamente.</p>
+      </form>
+      <div id="res" class="result" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</main>
+<footer id="foot">Sistema aberto · <a href="https://github.com/megazordy/eventos-hub">github.com/megazordy/eventos-hub</a></footer>
+<script>
+// Mesmo esquema de certificados/lib/crypto.js: PBKDF2(código) → 32 bytes de chave AES-GCM + 12 bytes de id público.
+const enc = new TextEncoder();
+const norm = c => (c || "").toLowerCase().replace(/[^a-z0-9-]/g, "");
+const hex = b => Array.from(b, x => x.toString(16).padStart(2, "0")).join("");
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const res = document.getElementById("res");
+const btn = document.getElementById("go");
+const cache = {};
+const getJson = async url => cache[url] ||= fetch(url, { cache: "no-cache" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+function show(cls, html) { res.className = "result " + cls; res.innerHTML = html; }
+const notFound = () => show("bad", '<div class="status">Código não encontrado</div><p class="hint">Confira se o código foi digitado corretamente. Se o problema continuar, fale com a organização do evento.</p>');
+
+async function verify(raw) {
+  const code = norm(raw);
+  if (!code) return;
+  document.getElementById("code").value = code.toUpperCase();
+  btn.disabled = true;
+  show("ok", '<div class="status">Verificando…</div>');
+  try {
+    const events = await getJson("events.json");
+    const ev = events.find(e => code.startsWith(e.prefix.toLowerCase() + "-"));
+    if (!ev) return notFound();
+    const { records } = await getJson(ev.data);
+    const base = await crypto.subtle.importKey("raw", enc.encode(code), "PBKDF2", false, ["deriveBits"]);
+    const bits = new Uint8Array(await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: enc.encode(ev.salt), iterations: ev.iterations }, base, 44 * 8));
+    const rec = records[hex(bits.slice(32))];
+    if (!rec) return notFound();
+    const key = await crypto.subtle.importKey("raw", bits.slice(0, 32), "AES-GCM", false, ["decrypt"]);
+    const d = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(rec.iv) }, key, unb64(rec.ct))));
+    let rows = `<dt>Certificado</dt><dd>${esc(d.type)}</dd>`;
+    if (d.team) rows += `<dt>Startup</dt><dd>${esc(d.team)}</dd>`;
+    rows += `<dt>Evento</dt><dd>${esc(ev.name)} (${esc(ev.edition)})</dd><dt>Data</dt><dd>${esc(ev.dates)}</dd><dt>Local</dt><dd>${esc(ev.city)}</dd><dt>Carga horária</dt><dd>${esc(ev.hours)} horas</dd><dt>Código</dt><dd>${esc(code.toUpperCase())}</dd>`;
+    const pdf = /^https:\/\/drive\.google\.com\//.test(d.pdfUrl || "")
+      ? `<a class="btn" href="${esc(d.pdfUrl)}" target="_blank" rel="noopener noreferrer">Abrir certificado (PDF)</a>`
+      : '<p class="hint">O PDF deste certificado ainda está sendo publicado. Tente novamente mais tarde.</p>';
+    show("ok", `<div class="status"><svg width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="#1F3862"/><path d="M5.5 10.5 L8.5 13.5 L14.5 7" fill="none" stroke="#FBC479" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Certificado válido</div><div class="name">${esc(d.name)}</div><dl>${rows}</dl>${pdf}`);
+    if (ev.contact) document.getElementById("foot").textContent = "Dúvidas: " + ev.contact;
+  } catch (e) {
+    show("bad", '<div class="status">Não foi possível verificar agora</div><p class="hint">Tente novamente em instantes ou em outro navegador.</p>');
+  } finally {
+    btn.disabled = false;
+  }
+}
+document.getElementById("f").addEventListener("submit", e => { e.preventDefault(); verify(document.getElementById("code").value); });
+function fromHash() { const h = decodeURIComponent(location.hash.slice(1)); if (h) verify(h); }
+window.addEventListener("hashchange", fromHash);
+fromHash();
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{
+  "id": "tsw-itapema-2026",
+  "name": "techstars_ Startup Weekend Itapema - Turistech",
+  "edition": "4ª edição",
+  "dates": {
+    "start": "2026-11-06",
+    "end": "2026-11-08",
+    "label": "6 a 8 de novembro de 2026",
+    "short": "6, 7 e 8/11/2026",
+    "issuedAt": "8 de novembro de 2026"
+  },
+  "hours": 54,
+  "city": "Itapema/SC",
+  "venue": "Centro Novos Caminhos",
+  "contact": "switapema@gmail.com · Instagram @switapema",
+
+  "colors": {
+    "navy": "#1F3862",
+    "teal": "#5AC7B3",
+    "tealDark": "#2A8F7F",
+    "peach": "#FBC479",
+    "text": "#323232",
+    "line": "#D5DCE6",
+    "panel": "#2B2A63",
+    "panelGlow": "#2A4F7D"
+  },
+
+  "signatures": [
+    { "name": "[NOME DO(A) LÍDER]", "role": "Organizador(a) Líder" },
+    { "name": "[NOME DO(A) VICE-LÍDER]", "role": "Organizador(a) Vice-líder" }
+  ],
+
+  "verification": {
+    "url": "https://megazordy.github.io/eventos-hub/",
+    "codePrefix": "TSWI26",
+    "salt": "tswi26-itapema-turistech",
+    "iterations": 150000
+  },
+
+  "drive": {
+    "path": ["Startup Weekend Itapema", "TSW - 2026", "Certificados"],
+    "controlFolder": "_Controle",
+    "controlSheet": "Controle de certificados - TSW Itapema 2026"
+  },
+
+  "types": {
+    "participante": {
+      "label": "Participante",
+      "driveFolder": "Participantes",
+      "templates": ["participant-front.html", "participant-back.html"]
+    },
+    "mentor": {
+      "label": "Mentor(a)",
+      "driveFolder": "Mentores",
+      "templates": ["mentor.html"]
+    },
+    "organizacao": {
+      "label": "Organizador(a)",
+      "driveFolder": "Organizadores",
+      "templates": ["organizer.html"]
+    },
+    "facilitador": {
+      "label": "Facilitador(a)",
+      "driveFolder": "Facilitadores",
+      "templates": ["facilitator.html"]
+    }
+  }
+}
