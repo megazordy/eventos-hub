@@ -229,3 +229,6 @@ output/
 
 *.local.json
 !certificados/lib/
+
+# assinaturas e outros arquivos sensíveis de cada evento
+eventos/*/assets/private/

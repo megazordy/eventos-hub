@@ -9,15 +9,20 @@
 @page { size: 1123px 794px; margin: 0; }
 body { margin: 0; }
 .page { width: 1123px; height: 794px; box-sizing: border-box; display: flex; overflow: hidden; background: #FFFFFF; font-family: Inter, sans-serif; color: var(--text); }
-.panel { width: 360px; height: 794px; box-sizing: border-box; padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between; background-color: var(--panel); background-image: radial-gradient(circle at 18% 88%, rgba(251,196,121,0.55), rgba(251,196,121,0) 42%), radial-gradient(circle at 92% 30%, rgba(90,199,179,0.45), rgba(90,199,179,0) 45%), radial-gradient(circle at 40% 10%, rgba(42,79,125,0.9), rgba(42,79,125,0) 55%); }
+.panel { flex: none; width: 324px; height: 794px; box-sizing: border-box; padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between; background-color: var(--panel); background-image: radial-gradient(circle at 18% 88%, rgba(251,196,121,0.55), rgba(251,196,121,0) 42%), radial-gradient(circle at 92% 30%, rgba(90,199,179,0.45), rgba(90,199,179,0) 45%), radial-gradient(circle at 40% 10%, rgba(42,79,125,0.9), rgba(42,79,125,0) 55%); }
 .brand { font-weight: 800; font-size: 22px; line-height: 1.08; letter-spacing: -0.01em; color: #FFFFFF; }
 .brand .t { color: var(--teal); }
-.main { flex: 1; height: 794px; box-sizing: border-box; padding: 64px 72px 56px; display: flex; flex-direction: column; position: relative; }
-.sig { width: 250px; display: flex; flex-direction: column; gap: 4px; }
+.main { flex: 1; height: 794px; box-sizing: border-box; padding: 64px 72px 56px; display: flex; flex-direction: column; position: relative; z-index: 0; }
+.sig { width: 250px; display: flex; flex-direction: column; gap: 4px; align-items: center; text-align: center; }
+.sig .line { align-self: stretch; }
 .sig .line { height: 1px; background: var(--text); margin-bottom: 8px; }
 .sig .n { font-weight: 700; font-size: 15px; }
 .sig .r { font-size: 13px; }
-.qr svg { width: 84px; height: 84px; display: block; }
+.qr { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.qr svg { width: 72px; height: 72px; display: block; }
+.qr-label { width: 80px; font-size: 9px; font-weight: 700; color: var(--navy); text-align: center; line-height: 1.2; }
+.community { position: absolute; width: 92px; opacity: 0.3; mix-blend-mode: multiply; z-index: -1; pointer-events: none; }
+
 </style>
 </head>
 <body>
@@ -31,22 +36,24 @@ body { margin: 0; }
     </div>
   </div>
   <div class="main">
+    <img class="community" src="assets/costa-valley.png" alt="" style="right: 66px; bottom: 10px">
     <div style="position: absolute; top: 52px; right: 60px"><svg width="52" height="52" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 C53 40 60 47 94 50 C60 53 53 60 50 94 C47 60 40 53 6 50 C40 47 47 40 50 6Z" fill="#1F3862"></path><g stroke="#FBC479" stroke-width="5" stroke-linecap="round"><line x1="20" y1="20" x2="28" y2="28"></line><line x1="80" y1="20" x2="72" y2="28"></line><line x1="20" y1="80" x2="28" y2="72"></line><line x1="80" y1="80" x2="72" y2="72"></line></g></svg></div>
     <h1 style="margin: 0; font-size: 64px; font-weight: 900; line-height: 1; letter-spacing: -0.03em; color: var(--navy)">Certificado</h1>
     <div style="margin-top: 14px"><span style="display: inline-flex; align-items: center; padding: 8px 20px; border-radius: 999px; background: var(--navy); color: #FFFFFF; font-weight: 800; font-size: 17px; line-height: 1">de facilitação</span></div>
-    <div style="font-size: 17px; font-weight: 500; margin-top: 44px">certificamos que</div>
+    <div style="font-size: 17px; font-weight: 500; margin-top: 44px">Certificamos que</div>
     <div style="font-size: 38px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; line-height: 1.1; margin-top: 10px">{{person.name}}</div>
+    {{#person.cpf}}<div style="font-size: 16px; font-weight: 700; color: var(--tealDark); margin-top: 8px">CPF {{person.cpf}}</div>{{/person.cpf}}
     <div style="width: 96px; height: 4px; border-radius: 4px; background: var(--teal); margin-top: 18px"></div>
     <p style="margin: 18px 0 0; font-size: 17px; line-height: 1.6; text-wrap: pretty">atuou como <b>facilitador(a)</b> na {{event.edition}} do <b>{{event.name}}</b>, realizada de {{event.dates.label}}, em {{event.city}}, conduzindo a programação e as equipes ao longo das {{event.hours}} horas.</p>
     <div style="margin-top: auto; display: flex; flex-direction: column; gap: 22px">
-      <div style="display: flex; justify-content: space-between; align-items: flex-end">
-        <div style="display: flex; gap: 48px">
-          <div class="sig"><div class="line"></div><div class="n">{{sig1.name}}</div><div class="r">{{sig1.role}}</div></div>
-          <div class="sig"><div class="line"></div><div class="n">{{sig2.name}}</div><div class="r">{{sig2.role}}</div></div>
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 32px">
+        <div style="display: flex; gap: 40px">
+          <div class="sig">{{#sig1.image}}<img src="{{sig1.image}}" alt="" style="height: 78px; max-width: 250px; object-fit: contain; object-position: center bottom; align-self: center; margin-bottom: -16px; mix-blend-mode: multiply">{{/sig1.image}}<div class="line"></div><div class="n">{{sig1.name}}</div><div class="r">{{sig1.role}}</div></div>
+          <div class="sig">{{#sig2.image}}<img src="{{sig2.image}}" alt="" style="height: 78px; max-width: 250px; object-fit: contain; object-position: center bottom; align-self: center; margin-bottom: -16px; mix-blend-mode: multiply">{{/sig2.image}}<div class="line"></div><div class="n">{{sig2.name}}</div><div class="r">{{sig2.role}}</div></div>
         </div>
-        <div class="qr">{{{qrSvg}}}</div>
+        <div class="qr">{{{qrSvg}}}<div class="qr-label">Verifique a autenticidade</div></div>
       </div>
-      <div style="font-size: 13px">{{event.city}}, {{event.dates.issuedAt}} · código de validação: <b>{{code}}</b> · {{verifyHost}}</div>
+      <div style="font-size: 13px">{{event.city}}, {{event.dates.issuedAt}} · Código de validação: {{code}}</div>
     </div>
   </div>
 </div>

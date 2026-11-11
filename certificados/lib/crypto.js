@@ -2,7 +2,8 @@
 // O código é a única chave: PBKDF2(código) gera o id público (12 bytes) e a chave AES-GCM (32 bytes).
 // Quem não tem o código não consegue ler nem enumerar os registros.
 // Mesmo esquema usado em docs/index.html — mudar um exige mudar o outro.
-const { subtle, getRandomValues } = globalThis.crypto;
+const { subtle } = globalThis.crypto;
+const getRandomValues = (arr) => globalThis.crypto.getRandomValues(arr);
 const enc = new TextEncoder();
 
 // Sem caracteres ambíguos (0/O, 1/I/L). 31 símbolos ^ 8 ≈ 40 bits por código.

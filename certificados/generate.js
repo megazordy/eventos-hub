@@ -116,6 +116,15 @@ async function main() {
     throw new Error('Drive não configurado (drive.local.json ou EVENTOS_HUB_DRIVE_URL/TOKEN). Use --no-upload para gerar só local.');
   }
 
+  // Imagens de assinatura ficam em assets/private/ (fora do Git). Faltando o arquivo, sai só o nome.
+  const signatures = event.signatures.map((s) => {
+    if (s.image && !existsSync(join(eventDir, s.image))) {
+      console.warn(`Aviso: assinatura não encontrada (${s.image}); o certificado sai só com o nome.`);
+      return { ...s, image: '' };
+    }
+    return s;
+  });
+
   const people = readPeopleCsv(args.list);
   const verifyHost = event.verification.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
   const pdfDir = join(outDir, draft ? '_draft' : typeConf.driveFolder);
@@ -134,6 +143,9 @@ async function main() {
       const verifyUrl = `${event.verification.url}#${code}`;
       const fileName = `${safeFileName(person.name)} - ${code}.pdf`;
       try {
+        if (typeConf.tiers && !typeConf.tiers.includes(person.tier)) {
+          throw new Error(`cota "${person.tier}" inválida; use: ${typeConf.tiers.join(', ')}`);
+        }
         const pdf = await renderPdf(browser, {
           eventDir,
           templates: typeConf.templates,
@@ -142,8 +154,8 @@ async function main() {
             event, person, code, verifyHost,
             qrSvg: await qrSvg(verifyUrl),
             cssVars: cssVars(event.colors),
-            sig1: event.signatures[0] || {},
-            sig2: event.signatures[1] || {},
+            sig1: signatures[0] || {},
+            sig2: signatures[1] || {},
           },
         });
         writeFileSync(join(pdfDir, fileName), pdf);
