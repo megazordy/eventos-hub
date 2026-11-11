@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Verificação de certificados</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap">
 <style>
   :root { --navy:#1F3862; --turq:#5AC7B3; --turq-dark:#2A8F7F; --peach:#FBC479; --graf:#323232; --line:#D5DCE6; --bg:#F4F6F9; --card:#fff; --muted:#5B6573; }
   * { box-sizing: border-box; }
@@ -23,10 +22,10 @@
   label { display:block; font-weight:800; color:var(--navy); font-size:15px; margin-bottom:10px; }
   .row { display:flex; gap:10px; flex-wrap:wrap; }
   input { flex:1 1 220px; min-width:0; min-height:48px; padding: 0 16px; border:1.5px solid var(--line); border-radius:999px;
-    font: 600 16px Inter, sans-serif; color:var(--navy); text-transform:uppercase; letter-spacing:.04em; }
+    font: 600 16px Inter, system-ui, sans-serif; color:var(--navy); text-transform:uppercase; letter-spacing:.04em; }
   input:focus { outline: 3px solid rgba(90,199,179,.45); border-color: var(--turq); }
   button, .btn { min-height:48px; padding: 0 24px; border:0; border-radius:999px; background:var(--navy); color:#fff;
-    font: 800 15px Inter, sans-serif; cursor:pointer; display:inline-flex; align-items:center; gap:8px; text-decoration:none; }
+    font: 800 15px Inter, system-ui, sans-serif; cursor:pointer; display:inline-flex; align-items:center; gap:8px; text-decoration:none; }
   button:hover, .btn:hover { background:#16294a; }
   button[disabled] { opacity:.6; cursor:wait; }
   .hint { font-size:13px; color:var(--muted); margin: 10px 0 0; }
@@ -38,6 +37,10 @@
   dl { display:grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 14px 0 18px; font-size:15px; }
   dt { font-weight:800; color:var(--turq-dark); }
   dd { margin:0; color:var(--navy); font-weight:600; overflow-wrap:anywhere; }
+  .privacy { margin-top: 24px; padding: 0 4px; font-size: 13px; line-height: 1.55; color: var(--muted); }
+  .privacy h2 { margin: 0 0 6px; font-size: 14px; font-weight: 800; color: var(--navy); }
+  .privacy p { margin: 0 0 8px; }
+  .privacy a { color: var(--navy); }
   footer { text-align:center; font-size:13px; color:var(--muted); padding: 0 16px 32px; }
   footer a { color: var(--muted); }
 </style>
@@ -63,6 +66,11 @@
       </form>
       <div id="res" class="result" role="status" aria-live="polite"></div>
     </div>
+    <section class="privacy" aria-labelledby="privacy-title">
+      <h2 id="privacy-title">Privacidade</h2>
+      <p>Esta página só mostra um certificado a quem informa o código dele: nome, tipo de certificado, startup (quando houver) e o link do PDF. Os registros ficam cifrados, e sem o código não é possível ler nem listar quem participou. A verificação acontece no seu navegador e o código não é enviado a nenhum servidor.</p>
+      <p>Os dados são usados apenas para emitir e comprovar os certificados do evento (LGPD, Lei 13.709/2018). Para corrigir dados ou pedir a remoção do seu certificado, fale com a organização: <a href="mailto:switapema@gmail.com">switapema@gmail.com</a>.</p>
+    </section>
   </div>
 </main>
 <footer id="foot">Sistema aberto · <a href="https://github.com/megazordy/eventos-hub">github.com/megazordy/eventos-hub</a></footer>

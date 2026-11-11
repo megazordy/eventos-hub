@@ -37,6 +37,8 @@ const readJson = (p, fallback) => (existsSync(p) ? JSON.parse(readFileSync(p, 'u
 const writeJson = (p, v) => { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, JSON.stringify(v, null, 2) + '\n'); };
 const sha = (v) => createHash('sha256').update(JSON.stringify(v)).digest('hex');
 const safeFileName = (s) => s.normalize('NFC').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, ' ').trim();
+// CPF parcialmente oculto no PDF (padrão usado pelo governo): 123.456.789-01 -> ***.456.789-**
+const maskCpf = (cpf) => (cpf ? cpf.replace(/^\d{3}/, '***').replace(/-\d{2}$/, '-**') : '');
 const personKey = (type, p) => `${type}|${(p.email || p.name).trim().toLowerCase()}`;
 
 function publicEventInfo(event) {
@@ -155,7 +157,7 @@ async function main() {
           templates: typeConf.templates,
           tmpDir,
           data: {
-            event, person, code, verifyHost,
+            event, person: { ...person, cpf: maskCpf(person.cpf) }, code, verifyHost,
             qrSvg: await qrSvg(verifyUrl),
             cssVars: cssVars(event.colors),
             sig1: signatures[0] || {},
@@ -165,7 +167,10 @@ async function main() {
         writeFileSync(join(pdfDir, fileName), pdf);
         if (draft) { ok++; console.log(`  prévia: ${fileName}`); continue; }
 
-        const entry = { ...existing, ...person, type: args.type, code, fileName, generatedAt: new Date().toISOString() };
+        // Controle local sem CPF (minimização, LGPD): o código e o e-mail bastam para reemitir.
+        const { cpf: _cpf, ...personWithoutCpf } = person;
+        const entry = { ...existing, ...personWithoutCpf, type: args.type, code, fileName, generatedAt: new Date().toISOString() };
+        delete entry.cpf;
         if (drive) {
           const res = await uploadCertificate(drive, {
             folderPath: [...event.drive.path, typeConf.driveFolder],
