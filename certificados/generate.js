@@ -37,6 +37,8 @@ const readJson = (p, fallback) => (existsSync(p) ? JSON.parse(readFileSync(p, 'u
 const writeJson = (p, v) => { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, JSON.stringify(v, null, 2) + '\n'); };
 const sha = (v) => createHash('sha256').update(JSON.stringify(v)).digest('hex');
 const safeFileName = (s) => s.normalize('NFC').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, ' ').trim();
+// "Mirante do Encanto" -> "mirante_do_encanto" (chave para seções do modelo)
+const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 // CPF parcialmente oculto no PDF (padrão usado pelo governo): 123.456.789-01 -> ***.456.789-**
 const maskCpf = (cpf) => (cpf ? cpf.replace(/^\d{3}/, '***').replace(/-\d{2}$/, '-**') : '');
 const personKey = (type, p) => `${type}|${(p.email || p.name).trim().toLowerCase()}`;
@@ -63,7 +65,7 @@ async function publishIndex(event, ledger) {
   for (const entry of Object.values(ledger.entries)) {
     const payload = {
       name: entry.name,
-      type: event.types[entry.type]?.label || entry.type,
+      type: (event.types[entry.type]?.label || entry.type) + (entry.tier ? ` · Cota ${entry.tier}` : ''),
       team: entry.team || '',
       role: entry.role || '',
       pdfUrl: entry.url || '',
@@ -160,7 +162,10 @@ async function main() {
           templates: typeConf.templates,
           tmpDir,
           data: {
-            event, person: { ...person, cpf: maskCpf(person.cpf) }, code, verifyHost,
+            event,
+            person: { ...person, cpf: maskCpf(person.cpf), logo: person.logo ? `assets/sponsors/${person.logo}` : '' },
+            tierIs: person.tier ? { [slug(person.tier)]: true } : {},
+            code, verifyHost,
             qrSvg: await qrSvg(verifyUrl),
             cssVars: cssVars(event.colors),
             sig1: signatures[0] || {},

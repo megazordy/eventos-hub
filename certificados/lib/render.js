@@ -14,8 +14,13 @@ const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
 const lookup = (data, path) => path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), data);
 
 export function fillTemplate(html, data) {
-  return html
-    .replace(/\{\{#([\w.]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, k, inner) => (lookup(data, k) ? inner : ''))
+  // Seções podem estar aninhadas: resolve até não sobrar nenhuma.
+  let out = html;
+  for (let prev = ''; prev !== out;) {
+    prev = out;
+    out = out.replace(/\{\{#([\w.]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, k, inner) => (lookup(data, k) ? inner : ''));
+  }
+  return out
     .replace(/\{\{\{([\w.]+)\}\}\}/g, (_, k) => String(lookup(data, k) ?? ''))
     .replace(/\{\{([\w.]+)\}\}/g, (_, k) => escapeHtml(lookup(data, k)));
 }
