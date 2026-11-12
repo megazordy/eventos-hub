@@ -232,3 +232,10 @@ output/
 
 # assinaturas e outros arquivos sensíveis de cada evento
 eventos/*/assets/private/
+
+# portal (Firebase): build, credenciais locais e cache da CLI
+portal/dist/
+portal/*.local
+portal/.firebase/
+portal/.firebaserc
+!portal/src/lib/

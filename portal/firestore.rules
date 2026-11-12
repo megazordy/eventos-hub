@@ -1,0 +1,83 @@
+rules_version = '2';
+// Regras do eventos-hub. Princípios:
+// - o Firestore nunca guarda CPF, e-mail ou lista de pessoas (isso fica no Drive do organizador);
+// - organização só cria eventos/registros depois de aprovada por um admin;
+// - cada organização só lê e altera os próprios eventos;
+// - registros de verificação são cifrados e só podem ser lidos um a um pelo id derivado do código
+//   (get liberado, list proibido): não dá para enumerar nem baixar a base.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function path(p) { return /databases/$(database)/documents/$(p); }
+    function isAdmin() { return signedIn() && exists(path('admins/' + request.auth.uid)); }
+    function hasProfile() { return signedIn() && exists(path('users/' + request.auth.uid)); }
+    function myOrgId() { return get(path('users/' + request.auth.uid)).data.orgId; }
+    function memberOf(orgId) { return hasProfile() && myOrgId() == orgId; }
+    function approved(orgId) { return get(path('orgs/' + orgId)).data.status == 'approved'; }
+    function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
+
+    // Admins são cadastrados manualmente no console (coleção admins, id = uid).
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+
+    // Perfil: liga o usuário à sua organização. Criado junto com a organização (mesmo batch).
+    match /users/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['orgId'])
+        && getAfter(path('orgs/' + request.resource.data.orgId)).data.ownerUid == request.auth.uid;
+      allow list, update, delete: if false;
+    }
+
+    match /orgs/{orgId} {
+      allow get: if isAdmin() || memberOf(orgId);
+      allow list: if isAdmin();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['name', 'contact', 'ownerUid', 'status', 'createdAt'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && str(request.resource.data.name, 3, 120)
+        && str(request.resource.data.contact, 0, 200)
+        && !exists(path('users/' + request.auth.uid));
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'approvedAt'])
+        && request.resource.data.status in ['pending', 'approved'];
+      allow delete: if false;
+    }
+
+    match /events/{eventId} {
+      allow read: if memberOf(resource.data.orgId);
+      allow create: if memberOf(request.resource.data.orgId) && approved(request.resource.data.orgId)
+        && str(request.resource.data.name, 1, 200);
+      allow update: if memberOf(resource.data.orgId) && approved(resource.data.orgId)
+        && request.resource.data.orgId == resource.data.orgId
+        && request.resource.data.salt == resource.data.salt
+        && request.resource.data.iterations == resource.data.iterations;
+      allow delete: if memberOf(resource.data.orgId);
+    }
+
+    // Dados públicos do evento (nome, datas, prefixo e parâmetros da derivação do código).
+    match /publicEvents/{eventId} {
+      allow read: if true;
+      allow create, update: if memberOf(request.resource.data.orgId) && approved(request.resource.data.orgId)
+        && get(path('events/' + eventId)).data.orgId == request.resource.data.orgId
+        && request.resource.data.prefix.matches('^[A-Z0-9]{3,10}$')
+        && (resource == null || resource.data.orgId == request.resource.data.orgId);
+      allow delete: if false;
+    }
+
+    // Registros cifrados da verificação. id = derivado do código (PBKDF2), conteúdo = AES-GCM.
+    match /records/{recordId} {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if signedIn()
+        && request.resource.data.keys().hasOnly(['eventId', 'iv', 'ct'])
+        && memberOf(get(path('publicEvents/' + request.resource.data.eventId)).data.orgId)
+        && approved(get(path('publicEvents/' + request.resource.data.eventId)).data.orgId)
+        && (resource == null || resource.data.eventId == request.resource.data.eventId);
+      allow delete: if false;
+    }
+  }
+}

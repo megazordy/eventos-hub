@@ -2,9 +2,13 @@
 
 Sistema aberto (MIT) para eventos: emissão de certificados em PDF com código único + QR e página pública de verificação. Primeiro evento: techstars_ Startup Weekend Itapema - Turistech 2026.
 
+## Portal (web)
+O portal em `portal/` permite que organizações aprovadas cadastrem eventos, editem modelos (1 ou 2 folhas), subam listas e gerem certificados direto no navegador, salvando os PDFs no próprio Google Drive. Veja [portal/README.md](portal/README.md).
+
 ## Estrutura
 - `certificados/` — módulo de certificados (`generate.js`, `lib/`, `apps-script/Code.gs`)
 - `eventos/<id>/` — um evento: `event.json` (nome, datas, carga horária, cores, assinaturas, Drive), `templates/*.html` (modelos editáveis), `assets/`
+- `portal/` — portal web (Firebase): eventos, modelos, listas e geração no navegador
 - `docs/` — página de verificação (GitHub Pages). Só dados cifrados.
 - `input/`, `output/` — listas e PDFs locais. **Fora do Git.**
 
