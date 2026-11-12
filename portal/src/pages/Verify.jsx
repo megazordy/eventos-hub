@@ -65,7 +65,7 @@ export default function Verify({ store, code }) {
         </div>
       )}
       <section className="muted" style={{ marginTop: 16 }}>
-        <b>Privacidade.</b> Esta página só mostra um certificado a quem informa o código dele. Os registros ficam cifrados e o código completo não sai do seu navegador: a verificação e a decifragem acontecem aqui. Os dados são usados apenas para comprovar certificados (LGPD, Lei 13.709/2018). {pub?.contact && <>Para corrigir dados ou pedir remoção: {pub.contact}.</>}
+        <b>Privacidade.</b> Esta página só mostra um certificado a quem informa o código dele. Os registros ficam cifrados e o código completo não sai do seu navegador: a verificação e a decifragem acontecem aqui. Os dados são usados apenas para comprovar certificados (LGPD, Lei 13.709/2018). {pub?.contact && <>Para corrigir dados ou pedir remoção: {pub.contact}.</>} <a href="#/privacidade">Política de privacidade</a>.
       </section>
     </main>
   );

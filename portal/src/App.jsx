@@ -8,6 +8,7 @@ import Events from './pages/Events.jsx';
 import EventForm from './pages/EventForm.jsx';
 import TemplateEditor from './pages/TemplateEditor.jsx';
 import Batch from './pages/Batch.jsx';
+import { Privacy, Terms } from './pages/Legal.jsx';
 
 // Rotas por hash (funciona em qualquer hospedagem estática, inclusive Firebase Hosting e GitHub Pages).
 function useRoute() {
@@ -43,6 +44,8 @@ export default function App() {
 
   // Verificação pública: não exige login.
   if (route[0] === 'v') return <Verify store={store} code={decodeURIComponent(route[1] || '')} />;
+  if (route[0] === 'privacidade') return <Privacy />;
+  if (route[0] === 'termos') return <Terms />;
 
   if (error) return <div className="wrap"><div className="card">Erro: {error}</div></div>;
   if (!store || user === undefined) return <div className="wrap muted">Carregando…</div>;
@@ -72,6 +75,7 @@ export default function App() {
       </header>
       {store.demo && <div className="demo-banner"><b>Modo demonstração:</b> o Firebase ainda não está configurado. Os dados ficam só neste navegador e os PDFs são baixados em ZIP.</div>}
       <main className="wrap">{page}</main>
+      <footer className="wrap muted" style={{ paddingTop: 0 }}><a href="#/privacidade">Privacidade</a> · <a href="#/termos">Termos de uso</a> · <a href="https://github.com/megazordy/eventos-hub">Código aberto</a></footer>
     </>
   );
 }

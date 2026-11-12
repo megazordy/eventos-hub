@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Field, Text, Area, Select, ListEditor, ImageInput, Preview } from '../components/ui.jsx';
 import { CORNER_ICONS } from '../lib/icons.js';
 import { TEXT_VARS } from '../lib/template.js';
+import { tswEvent, defaultTypes } from '../lib/presets.js';
+
+// Modelos prontos que podem ser aplicados a qualquer tipo de certificado.
+const READY = [
+  ...Object.entries(defaultTypes()).map(([k, t]) => [`simples.${k}`, `Simples · ${t.label}`, t.template]),
+  ...Object.entries(tswEvent().types).map(([k, t]) => [`sw.${k}`, `Startup Weekend · ${t.label}`, t.template]),
+];
 
 const COLORS = [['teal', 'Turquesa'], ['peach', 'Pêssego'], ['navy', 'Azul-marinho']];
 const COLOR_LABELS = { navy: 'Principal (títulos)', teal: 'Destaque', tealDark: 'Destaque escuro', peach: 'Secundária', text: 'Texto', line: 'Linhas', panel: 'Faixa lateral' };
@@ -54,6 +61,18 @@ export default function TemplateEditor({ store, eventId, typeKey }) {
         <h1>Modelo · {type.label}</h1>
         <div className="row">
           <a className="btn secondary" href={`#/events/${eventId}`}>Voltar ao evento</a>
+          <select
+            aria-label="Aplicar modelo pronto"
+            value=""
+            style={{ width: 'auto' }}
+            onChange={(e) => {
+              const ready = READY.find(([k]) => k === e.target.value);
+              if (ready && window.confirm(`Substituir o modelo atual por "${ready[1]}"? As alterações não salvas serão perdidas.`)) setT(structuredClone(ready[2]));
+            }}
+          >
+            <option value="">Aplicar modelo pronto…</option>
+            {READY.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+          </select>
           <button type="button" className="btn" onClick={save}>Salvar modelo</button>
         </div>
       </div>

@@ -75,7 +75,7 @@ async function firebaseStore() {
     async myOrg() { const p = await myProfile(); return p?.orgId ? snap(d('orgs', p.orgId)) : null; },
     async createOrg(data) {
       const ref = fs.doc(fs.collection(db, 'orgs'));
-      const org = { name: data.name, contact: data.contact, ownerUid: a.currentUser.uid, status: 'pending', createdAt: fs.serverTimestamp() };
+      const org = { name: data.name, contact: data.contact, ownerUid: a.currentUser.uid, status: 'pending', createdAt: fs.serverTimestamp(), termsAcceptedAt: fs.serverTimestamp() };
       const batch = fs.writeBatch(db);
       batch.set(ref, org);
       batch.set(d('users', a.currentUser.uid), { orgId: ref.id });

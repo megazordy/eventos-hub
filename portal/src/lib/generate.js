@@ -8,19 +8,13 @@ import { pagesToPdf, qrSvg, safeFileName } from './pdf.js';
 import { maskCpf } from './lists.js';
 import { verifyLink } from './config.js';
 import { ensureFolderPath, putFile, shareWithLink, readJsonFile, fileLink } from './gdrive.js';
+import { publicEventOf } from './public-event.js';
 
 const ROOT_FOLDER = 'eventos-hub';
 const LEDGER_FILE = 'controle-de-codigos.json';
 const CONTROL_CSV = 'Controle de certificados.csv';
 
 export const personKey = (type, p) => `${type}|${(p.email || p.name).trim().toLowerCase()}`;
-
-export function publicEventOf(event) {
-  return {
-    id: event.id, orgId: event.orgId || '', prefix: event.prefix.toUpperCase(), salt: event.salt, iterations: event.iterations,
-    name: event.name, edition: event.edition || '', dates: event.dates || '', hours: event.hours || '', city: event.city || '', contact: event.contact || '',
-  };
-}
 
 function payloadOf(event, typeKey, entry) {
   const type = event.types[typeKey];

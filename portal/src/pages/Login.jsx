@@ -17,6 +17,7 @@ export default function Login({ store }) {
           <button type="button" className="btn" disabled={busy} onClick={signIn}>Entrar com Google</button>
           <a className="btn secondary" href="#/v">Verificar um certificado</a>
         </div>
+        <p className="muted"><a href="#/privacidade">Política de privacidade</a> · <a href="#/termos">Termos de uso</a></p>
         {error && <p style={{ color: 'var(--danger)' }}>{error}</p>}
       </div>
     </main>

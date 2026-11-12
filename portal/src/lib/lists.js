@@ -1,6 +1,7 @@
 // Leitura de listas (CSV ou XLSX) no navegador. Os dados nunca saem do computador do organizador,
 // exceto para o Drive dele. Sem estado global.
-import * as XLSX from 'xlsx';
+// A biblioteca de planilhas (~400 kB) é carregada só quando uma lista é aberta.
+const loadXlsx = () => import('xlsx');
 
 export const FIELDS = [
   { key: 'name', label: 'Nome no certificado', required: true },
@@ -43,6 +44,7 @@ export function guessMapping(headers) {
 
 export async function readSheet(file) {
   // CSV é lido como texto UTF-8 (acentos); planilhas (xlsx/ods) como binário.
+  const XLSX = await loadXlsx();
   const isCsv = /\.csv$/i.test(file.name) || file.type === 'text/csv';
   const wb = isCsv
     ? XLSX.read((await file.text()).replace(/^﻿/, ''), { type: 'string', raw: true })

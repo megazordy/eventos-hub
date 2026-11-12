@@ -239,3 +239,4 @@ portal/*.local
 portal/.firebase/
 portal/.firebaserc
 !portal/src/lib/
+portal/*-debug.log

@@ -8,12 +8,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
-    function path(p) { return /databases/$(database)/documents/$(p); }
-    function isAdmin() { return signedIn() && exists(path('admins/' + request.auth.uid)); }
-    function hasProfile() { return signedIn() && exists(path('users/' + request.auth.uid)); }
-    function myOrgId() { return get(path('users/' + request.auth.uid)).data.orgId; }
+    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function hasProfile() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)); }
+    function myOrgId() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.orgId; }
     function memberOf(orgId) { return hasProfile() && myOrgId() == orgId; }
-    function approved(orgId) { return get(path('orgs/' + orgId)).data.status == 'approved'; }
+    function approved(orgId) { return get(/databases/$(database)/documents/orgs/$(orgId)).data.status == 'approved'; }
     function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
 
     // Admins são cadastrados manualmente no console (coleção admins, id = uid).
@@ -27,7 +26,7 @@ service cloud.firestore {
       allow get: if signedIn() && request.auth.uid == uid;
       allow create: if signedIn() && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['orgId'])
-        && getAfter(path('orgs/' + request.resource.data.orgId)).data.ownerUid == request.auth.uid;
+        && getAfter(/databases/$(database)/documents/orgs/$(request.resource.data.orgId)).data.ownerUid == request.auth.uid;
       allow list, update, delete: if false;
     }
 
@@ -35,12 +34,13 @@ service cloud.firestore {
       allow get: if isAdmin() || memberOf(orgId);
       allow list: if isAdmin();
       allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['name', 'contact', 'ownerUid', 'status', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['name', 'contact', 'ownerUid', 'status', 'createdAt', 'termsAcceptedAt'])
+        && request.resource.data.termsAcceptedAt == request.time
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.status == 'pending'
         && str(request.resource.data.name, 3, 120)
         && str(request.resource.data.contact, 0, 200)
-        && !exists(path('users/' + request.auth.uid));
+        && !exists(/databases/$(database)/documents/users/$(request.auth.uid));
       allow update: if isAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'approvedAt'])
         && request.resource.data.status in ['pending', 'approved'];
@@ -62,7 +62,7 @@ service cloud.firestore {
     match /publicEvents/{eventId} {
       allow read: if true;
       allow create, update: if memberOf(request.resource.data.orgId) && approved(request.resource.data.orgId)
-        && get(path('events/' + eventId)).data.orgId == request.resource.data.orgId
+        && get(/databases/$(database)/documents/events/$(eventId)).data.orgId == request.resource.data.orgId
         && request.resource.data.prefix.matches('^[A-Z0-9]{3,10}$')
         && (resource == null || resource.data.orgId == request.resource.data.orgId);
       allow delete: if false;
@@ -74,8 +74,8 @@ service cloud.firestore {
       allow list: if false;
       allow create, update: if signedIn()
         && request.resource.data.keys().hasOnly(['eventId', 'iv', 'ct'])
-        && memberOf(get(path('publicEvents/' + request.resource.data.eventId)).data.orgId)
-        && approved(get(path('publicEvents/' + request.resource.data.eventId)).data.orgId)
+        && memberOf(get(/databases/$(database)/documents/publicEvents/$(request.resource.data.eventId)).data.orgId)
+        && approved(get(/databases/$(database)/documents/publicEvents/$(request.resource.data.eventId)).data.orgId)
         && (resource == null || resource.data.eventId == request.resource.data.eventId);
       allow delete: if false;
     }

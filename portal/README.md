@@ -23,8 +23,13 @@ cd portal
 bun install
 bun run dev        # http://localhost:5173
 bun run test       # testes unitários (inclui compatibilidade com o CLI)
+bun run test:rules # regras do Firestore no emulador (precisa de Java e da CLI do Firebase)
 bun run build      # gera portal/dist
 ```
+
+O emulador usa as portas 8095, 4495 e 4595 para não conflitar com outros projetos. No Windows ele às vezes
+fica rodando depois dos testes; se a porta 8095 estiver ocupada, encerre o processo `java` dessa porta.
+O GitHub Actions (`.github/workflows/ci.yml`) roda os testes, as regras e o build em cada PR.
 
 Sem `.env.local`, o portal abre em **modo demonstração**: tudo fica no navegador e os PDFs são baixados em ZIP.
 

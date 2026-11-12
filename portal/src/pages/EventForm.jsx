@@ -3,7 +3,7 @@ import { Field, Text, ImageInput, Select } from '../components/ui.jsx';
 import { defaultTypes, tswEvent, baseTemplate } from '../lib/presets.js';
 import { newSalt } from '../lib/crypto.js';
 import { PBKDF2_ITERATIONS } from '../lib/config.js';
-import { publicEventOf } from '../lib/generate.js';
+import { publicEventOf } from '../lib/public-event.js';
 import { TIER_ICONS } from '../lib/icons.js';
 import { go } from '../lib/nav.js';
 
@@ -60,6 +60,21 @@ export default function EventForm({ store, org, eventId }) {
     } catch (e) { setMsg(e.message); } finally { setBusy(false); }
   };
 
+  // Excluir o evento não apaga os registros públicos: os certificados emitidos continuam verificáveis.
+  const removeEvent = async () => {
+    const typed = window.prompt(`Para excluir o evento, digite o prefixo ${ev.prefix}.\n\nOs certificados já emitidos continuam verificáveis e os PDFs no seu Drive não são apagados.`);
+    if (typed?.trim().toUpperCase() !== ev.prefix) return;
+    await store.deleteEvent(ev.id);
+    go('/');
+  };
+
+  const duplicateType = (key) => {
+    const t = ev.types[key];
+    let n = 2;
+    while (ev.types[`${key}_${n}`]) n++;
+    setEv({ ...ev, types: { ...ev.types, [`${key}_${n}`]: { ...structuredClone(t), label: `${t.label} (cópia)` } } });
+  };
+
   const addType = () => {
     const label = newType.trim();
     const key = slugKey(label);
@@ -74,6 +89,7 @@ export default function EventForm({ store, org, eventId }) {
         <h1>{ev.id ? ev.name : 'Novo evento'}</h1>
         <div className="row">
           {ev.id && <a className="btn secondary" href={`#/events/${ev.id}/batch`}>Gerar certificados</a>}
+          {ev.id && <button type="button" className="btn danger" onClick={removeEvent}>Excluir evento</button>}
           <button type="button" className="btn" disabled={busy} onClick={save}>Salvar evento</button>
         </div>
       </div>
@@ -122,6 +138,7 @@ export default function EventForm({ store, org, eventId }) {
                 <td><Text value={t.dates || ''} onChange={(v) => setType(key, { dates: v })} placeholder="(do evento)" /></td>
                 <td className="row">
                   {ev.id ? <a className="btn secondary" href={`#/events/${ev.id}/types/${key}`}>Editar modelo</a> : <span className="muted">Salve para editar</span>}
+                  <button type="button" className="btn secondary" onClick={() => duplicateType(key)}>Duplicar</button>
                   <button type="button" className="btn secondary" aria-label={`Remover ${t.label}`} onClick={() => { const { [key]: _, ...rest } = ev.types; setEv({ ...ev, types: rest }); }}>×</button>
                 </td>
               </tr>

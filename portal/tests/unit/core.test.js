@@ -1,9 +1,9 @@
 import { describe, test, expect } from 'vitest';
-import * as portal from '../src/lib/crypto.js';
-import * as cli from '../../certificados/lib/crypto.js';
-import { renderPages, fmt } from '../src/lib/template.js';
-import { tswEvent, defaultTypes } from '../src/lib/presets.js';
-import { guessMapping, toPeople, validatePeople, isValidCpf, formatCpf, maskCpf } from '../src/lib/lists.js';
+import * as portal from '../../src/lib/crypto.js';
+import * as cli from '../../../certificados/lib/crypto.js';
+import { renderPages, fmt } from '../../src/lib/template.js';
+import { tswEvent, defaultTypes } from '../../src/lib/presets.js';
+import { guessMapping, toPeople, validatePeople, isValidCpf, formatCpf, maskCpf } from '../../src/lib/lists.js';
 
 const verification = { salt: 'teste-salt', iterations: 1000 };
 

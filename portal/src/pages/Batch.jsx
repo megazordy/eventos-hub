@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Field, Select, fileToDataUrl } from '../components/ui.jsx';
 import { FIELDS, readSheet, guessMapping, toPeople, validatePeople } from '../lib/lists.js';
-import { generateBatch } from '../lib/generate.js';
 
 // Lote: escolhe o tipo, sobe a lista (CSV/XLSX), confere o mapeamento e gera os certificados.
 // A lista é lida só no navegador; nada dela vai para o servidor do portal.
@@ -37,6 +36,8 @@ export default function Batch({ store, eventId }) {
   const run = async () => {
     setError(''); setResult(null);
     try {
+      // Geração (PDF, imagem, ZIP) carregada sob demanda.
+      const { generateBatch } = await import('../lib/generate.js');
       const res = await generateBatch({ store, event: ev, typeKey, people, files: logos, onProgress: setProgress });
       setResult(res);
     } catch (e) { setError(e.message); } finally { setProgress(null); }
