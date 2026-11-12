@@ -8,6 +8,7 @@ import Events from './pages/Events.jsx';
 import EventForm from './pages/EventForm.jsx';
 import TemplateEditor from './pages/TemplateEditor.jsx';
 import Batch from './pages/Batch.jsx';
+import Contacts from './pages/Contacts.jsx';
 import { Privacy, Terms } from './pages/Legal.jsx';
 
 // Rotas por hash (funciona em qualquer hospedagem estática, inclusive Firebase Hosting e GitHub Pages).
@@ -58,6 +59,7 @@ export default function App() {
   else if (route[0] === 'events' && route[1] === 'new') page = <EventForm {...ctx} eventId={null} />;
   else if (route[0] === 'events' && route[2] === 'types' && route[3]) page = <TemplateEditor {...ctx} eventId={route[1]} typeKey={route[3]} />;
   else if (route[0] === 'events' && route[2] === 'batch') page = <Batch {...ctx} eventId={route[1]} />;
+  else if (route[0] === 'events' && route[2] === 'contacts') page = <Contacts {...ctx} eventId={route[1]} />;
   else if (route[0] === 'events' && route[1]) page = <EventForm {...ctx} eventId={route[1]} />;
   else page = <Events {...ctx} />;
 

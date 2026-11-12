@@ -3,6 +3,8 @@
 Portal web para organizações emitirem certificados de eventos: cadastro da organização (com aprovação),
 cadastro do evento, editor de modelo (1 ou 2 folhas, com prévia ao vivo), upload de listas (CSV/Excel),
 geração dos PDFs com código único + QR e página pública de verificação.
+Também tem a tela **Contatos e WhatsApp**: filtra a lista (equipe, função, busca), exporta a lista filtrada em
+Excel e monta um link do WhatsApp por pessoa com a mensagem personalizada (envio manual, um clique por conversa).
 
 ## Como funciona (e por que é seguro para a LGPD)
 
@@ -40,6 +42,7 @@ Sem `.env.local`, o portal abre em **modo demonstração**: tudo fica no navegad
 - `src/lib/pdf.js` — rasteriza as páginas e monta o PDF no navegador
 - `src/lib/generate.js` — geração em lote (códigos, PDF, Drive, registros cifrados)
 - `src/lib/lists.js` — leitura de CSV/XLSX, mapeamento de colunas e validação
+- `src/lib/contacts.js` — filtro, telefone para WhatsApp, mensagem personalizada e exportação
 - `src/lib/store.js` — dados (Firebase ou modo demonstração)
 - `src/lib/gdrive.js` — Google Drive do organizador
 - `firestore.rules` — regras de segurança

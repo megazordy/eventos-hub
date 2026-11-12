@@ -6,6 +6,7 @@ const loadXlsx = () => import('xlsx');
 export const FIELDS = [
   { key: 'name', label: 'Nome no certificado', required: true },
   { key: 'email', label: 'E-mail' },
+  { key: 'phone', label: 'Telefone / WhatsApp' },
   { key: 'team', label: 'Equipe / startup' },
   { key: 'role', label: 'Função' },
   { key: 'cpf', label: 'CPF' },
@@ -23,6 +24,7 @@ const norm = (h) => String(h || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toL
 const GUESS = {
   name: ['nome', 'nome completo', 'nome no certificado', 'name', 'qual seu nome completo?'],
   email: ['email', 'e-mail', 'qual seu e-mail?'],
+  phone: ['telefone', 'celular', 'whatsapp', 'telefone/whatsapp', 'telefone / whatsapp', 'fone', 'phone', 'qual seu telefone?', 'qual seu whatsapp?'],
   team: ['equipe', 'startup', 'equipe/startup', 'startup/equipe', 'team'],
   role: ['funcao', 'cargo', 'role'],
   cpf: ['cpf', 'digite seu cpf'],

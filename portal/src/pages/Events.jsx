@@ -21,6 +21,7 @@ export default function Events({ store, org }) {
             <div className="row" style={{ marginTop: 12 }}>
               <a className="btn secondary" href={`#/events/${ev.id}`}>Editar</a>
               <a className="btn" href={`#/events/${ev.id}/batch`}>Gerar certificados</a>
+              <a className="btn secondary" href={`#/events/${ev.id}/contacts`}>Contatos e WhatsApp</a>
             </div>
           </div>
         ))}

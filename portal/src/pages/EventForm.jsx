@@ -89,6 +89,7 @@ export default function EventForm({ store, org, eventId }) {
         <h1>{ev.id ? ev.name : 'Novo evento'}</h1>
         <div className="row">
           {ev.id && <a className="btn secondary" href={`#/events/${ev.id}/batch`}>Gerar certificados</a>}
+          {ev.id && <a className="btn secondary" href={`#/events/${ev.id}/contacts`}>Contatos e WhatsApp</a>}
           {ev.id && <button type="button" className="btn danger" onClick={removeEvent}>Excluir evento</button>}
           <button type="button" className="btn" disabled={busy} onClick={save}>Salvar evento</button>
         </div>

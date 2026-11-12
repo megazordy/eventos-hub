@@ -51,3 +51,8 @@ details.section[open] summary { margin-bottom: 10px; }
 .progress div { height: 100%; background: var(--teal); transition: width .2s; }
 .thumb { max-height: 48px; max-width: 160px; object-fit: contain; border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 4px; }
 @media (max-width: 900px) { .editor { grid-template-columns: 1fr; } .editor .form { max-height: none; } }
+.btn.whatsapp { background: #128C4A; }
+.btn.whatsapp:hover { background: #0E6F3A; }
+tr.sent { opacity: .55; }
+.msg-preview { white-space: pre-wrap; font: 14px/1.5 Inter, sans-serif; background: #E7F7EE; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 6px 0 0; }
+input[type=checkbox] { width: 18px; height: 18px; padding: 0; flex: none; }
