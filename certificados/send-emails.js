@@ -5,6 +5,12 @@
 //   node certificados/send-emails.js --event tsw-itapema-2026 --test voce@ex.com   (1 e-mail de cada tipo para o endereço de teste)
 //   node certificados/send-emails.js --event tsw-itapema-2026 --send [--type mentor] [--resend]
 //
+// Reenvio para uma pessoa (pelo e-mail da lista ou pelo código do certificado):
+//   ... --send --email pessoa@ex.com --resend
+//   ... --send --code TSWI26-XXXX-XXXX-XXXX --resend
+// Para outro endereço (o e-mail da lista não muda; o ledger guarda para onde foi):
+//   ... --send --email pessoa@ex.com --to outro@ex.com
+//
 // Textos: eventos/<evento>/emails.json. Apelido: coluna "apelido" das listas em input/ (senão, primeiro nome).
 // IO / estado: lê event.json, emails.json, input/*.csv e output/<evento>/ledger.json; envia via Apps Script;
 // no envio real grava emailSentAt no ledger (local, fora do Git) para não reenviar.
@@ -69,8 +75,22 @@ async function main() {
 
   let entries = Object.values(ledger.entries).filter((e) => e.url && e.email);
   if (args.type) entries = entries.filter((e) => e.type === args.type);
+  if (args.email) entries = entries.filter((e) => e.email.toLowerCase() === String(args.email).trim().toLowerCase());
+  if (args.code) entries = entries.filter((e) => e.code === String(args.code).trim().toUpperCase());
+  // --to: reenvia o certificado de UMA pessoa para outro endereço (o e-mail da lista não muda).
+  if (args.to) {
+    if (!args.send) throw new Error('--to só funciona junto com --send.');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(args.to))) throw new Error(`E-mail inválido em --to: ${args.to}`);
+    if (!args.email && !args.code) throw new Error('Com --to, informe a pessoa com --email (o da lista) ou --code.');
+    if (entries.length !== 1) throw new Error(entries.length ? 'Mais de uma pessoa encontrada; use --code.' : 'Pessoa não encontrada na lista de certificados.');
+    args.resend = true;
+  }
   if (args.test) entries = Object.values(Object.fromEntries(entries.map((e) => [e.type, e]))); // 1 por tipo
-  if (args.send && !args.resend) entries = entries.filter((e) => !e.emailSentAt);
+  if (args.send && !args.resend) {
+    const already = entries.filter((e) => e.emailSentAt);
+    entries = entries.filter((e) => !e.emailSentAt);
+    if (!entries.length && already.length) { console.log(`Já enviado (${already.map((e) => `${e.name} em ${e.emailSentAt}`).join('; ')}). Use --resend para enviar de novo.`); return; }
+  }
   if (!entries.length) { console.log('Nada a enviar.'); return; }
 
   const build = (e) => buildMessage(event, texts, e, nick[e.email.toLowerCase()] || e.name.split(' ')[0]);
@@ -92,15 +112,19 @@ async function main() {
   let ok = 0;
   for (const e of entries) {
     const m = build(e);
-    const to = args.test || e.email;
+    const to = args.test || args.to || e.email;
     try {
       const res = await sendCertificateEmail(drive, {
         to, subject: args.test ? `[TESTE · ${e.type}] ${m.subject}` : m.subject, text: m.text, html: m.html,
         fileId: e.url.match(/\/d\/([\w-]+)/)[1], senderName: texts.senderName, replyTo: texts.replyTo,
       });
-      if (!args.test) { e.emailSentAt = new Date().toISOString(); writeFileSync(ledgerPath, JSON.stringify(ledger, null, 2) + '\n'); }
+      if (!args.test) {
+        e.emailSentAt = new Date().toISOString();
+        if (args.to) e.emailSentTo = to; else delete e.emailSentTo;
+        writeFileSync(ledgerPath, JSON.stringify(ledger, null, 2) + '\n');
+      }
       ok++;
-      console.log(`  enviado: ${e.type} · ${args.test ? 'teste' : e.name} (cota restante hoje: ${res.remaining})`);
+      console.log(`  enviado: ${e.type} · ${args.test ? 'teste' : e.name} → ${to} (cota restante hoje: ${res.remaining})`);
     } catch (err) {
       console.error(`  ERRO: ${e.type} · ${e.name}: ${err.message}`);
     }
